@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#9fdcff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+<title>Baby Dollhouse</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap">
+
+</head>
+<body>
+<div id="stage"></div>
+<div class="hud">
+  <div class="stars" id="stars" aria-live="polite">⭐ <span id="starCount">0</span></div>
+  <button class="btn" id="soundBtn" aria-label="Sound on or off">🔊</button>
+</div>
+<div class="hint" id="hint" aria-hidden="true">👆 👶 💖</div>
+<div class="toast" id="toast" hidden aria-live="polite"></div>
+<div class="fallback" id="fallback" hidden>This game needs a browser with 3D graphics turned on.</div>
+<div class="mini" id="mini" hidden>
+  <div class="card">
+    <div class="cardtop">
+      <button class="btn back" id="miniBack" aria-label="Back to the house">🏠</button>
+      <button class="word" id="word" aria-label="Hear the word"></button>
+      <div class="dots" id="dots" hidden></div>
+    </div>
+    <div class="arena" id="arena"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="game.js"></script>
+
+</body>
+</html>
