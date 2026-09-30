@@ -1165,10 +1165,17 @@ anim: "stir"
 }, {
 id: "dish",
 p: [ -.75, .1, -.4 ],
-word: "WASH",
-e: "🧽",
+word: "DISHES",
+e: "🍽️",
 line: "is washing the dishes",
 anim: "scrub"
+}, {
+id: "laundry",
+p: [ -3.55, FH + .1, -.45 ],
+word: "WASH",
+e: "🧺",
+line: "is doing the laundry",
+anim: "fold"
 }, {
 id: "tub",
 p: [ 3.7, .1, 1.05 ],
@@ -1231,7 +1238,16 @@ mesh(cyl(.14, .14, .05, 16), "#3a3350", -2.85, .93, -1.3, house);
 mesh(cyl(.2, .18, .25, 16), "#ff5a6e", -2.55, 1.02, -1.25, house);
 mesh(box(.9, .8, .55), "#9be7c4", -.75, .4, -1.3, house);
 mesh(box(.6, .05, .35), "#7fd3ff", -.75, .82, -1.25, house);
+mesh(box(.5, .06, .3), "#b8c0cc", -.05, .83, -1.3, house);
+for (let i = 0; i < 3; i++) mesh(cyl(.12, .12, .02, 16), "#ffffff", -.2 + i * .14, .95, -1.3, house).rotation.x = Math.PI / 2;
 mesh(cyl(.3, .25, .35, 16), "#e8b27d", -3.35, FH + .28, .3, house);
+mesh(box(.75, .85, .6), "#ffffff", -3.95, FH + .52, -1.2, house);
+mesh(cyl(.24, .24, .05, 24), "#b8c0cc", -3.95, FH + .48, -.89, house).rotation.x = Math.PI / 2;
+mesh(cyl(.18, .18, .06, 24), "#7fd3ff", -3.95, FH + .48, -.88, house, {
+emissive: "#3aa8e0",
+emissiveIntensity: .2
+}).rotation.x = Math.PI / 2;
+mesh(ball(.05, 8), "#b9a2ff", -3.75, FH + .86, -.9, house);
 mesh(ball(.13, 8), "#ff6fae", -3.4, FH + .47, .3, house);
 mesh(ball(.12, 8), "#7fd3ff", -3.25, FH + .46, .35, house);
 const chair = new T.Group;
@@ -1332,7 +1348,7 @@ hair: "#b5532b",
 pigtails: true,
 bow: "#ffc93c"
 }) ];
-const startAt = [ "rake", "cook", "read", "tidy", "sing" ];
+const startAt = [ "dish", "laundry", "rake", "tidy", "sing" ];
 family.forEach((f, i) => {
 house.add(f);
 arriveAt(f, STATIONS.find(s => s.id === startAt[i]));
@@ -1596,6 +1612,248 @@ const out = [];
 for (let i = 0; i < n; i++) out.push(pick(arr));
 return out;
 };
+// DISHES: tap a dirty dish to dunk it in the bubbly sink, scrub it clean, it hops onto the drying rack.
+// learn: the clean dishes are counted as they land on the rack.
+function dishesChore(learn) {
+arena.classList.add("chore", "c-kitchen");
+const kinds = [ "🍽️", "🥣", "☕", "🥄", "🍽️", "🥣" ];
+const N = learn ? rint(3, 5) : 4;
+const sink = el('<div class="sink"><div class="suds"></div><div class="faucet"></div></div>');
+const rack = el('<div class="rack"><div class="rackdishes"></div></div>');
+arena.append(sink, rack);
+const rackDishes = rack.querySelector(".rackdishes");
+for (let i = 0; i < 5; i++) later(() => {
+const b = el('<span class="bub"></span>');
+b.style.left = rnd(8, 88) + "%";
+b.style.animationDelay = rnd(0, 2).toFixed(2) + "s";
+sink.appendChild(b);
+}, 0);
+const sponge = el('<div class="tool sponge2">🧽</div>');
+sponge.hidden = true;
+arena.appendChild(sponge);
+const point = el('<div class="point">👆</div>');
+let inSink = null, dirt = 0, rubs = 0, done = 0;
+spread(N, [ 8, 92, 6, 30 ], 3).forEach((p, k) => {
+const d = el(`<button class="dirtydish" aria-label="Dirty dish"><span class="dd">${kinds[k % kinds.length]}</span><i class="gr g1"></i><i class="gr g2"></i><i class="gr g3"></i></button>`);
+d.style.left = p[0] + "%";
+d.style.top = p[1] + "%";
+arena.appendChild(d);
+if (k === 0) {
+point.style.left = `calc(${p[0]}% + 10px)`;
+point.style.top = `calc(${p[1]}% + 30px)`;
+arena.appendChild(point);
+}
+tapOn(d, () => {
+if (mg.done || d.classList.contains("fly")) return;
+if (inSink) {
+d.classList.remove("nope");
+void d.offsetWidth;
+d.classList.add("nope");
+return;
+}
+if (point.parentNode) point.remove();
+inSink = d;
+flyTo(d, sink, .5, .45);
+sfx.boing();
+later(() => {
+const [x, y] = rel(sink, .5, .2);
+puff(x, y, "💦");
+puff(x - 30, y, "🫧");
+puff(x + 30, y, "🫧");
+sfx.gulp();
+d.remove();
+const sd = el(`<div class="sinkdish"><span class="dd">${d.querySelector(".dd").textContent}</span><i class="gr g1"></i><i class="gr g2"></i><i class="gr g3"></i></div>`);
+sink.appendChild(sd);
+inSink = sd;
+dirt = 3;
+rubs = 0;
+sponge.hidden = false;
+const [sx, sy] = rel(sink, .82, .5);
+sponge.style.transform = `translate(${sx - 36}px, ${sy - 36}px)`;
+if (done === 0) {
+const p2 = el('<div class="point rub">👆</div>');
+p2.style.left = "50%";
+p2.style.top = "68%";
+p2.classList.add("rubhint");
+arena.appendChild(p2);
+}
+}, 450);
+});
+});
+function scrubAt(ev) {
+const [x, y] = localXY(ev);
+if (!sponge.hidden) sponge.style.transform = `translate(${x - 36}px, ${y - 36}px)`;
+if (!down || mg.done || !inSink || !inSink.classList.contains("sinkdish")) return;
+const r = inSink.getBoundingClientRect();
+if (ev.clientX < r.left - 20 || ev.clientX > r.right + 20 || ev.clientY < r.top - 20 || ev.clientY > r.bottom + 20) return;
+const h = arena.querySelector(".rubhint");
+if (h) h.remove();
+if (++rubs % 5) {
+if (Math.random() < .2) puff(x, y, "🫧");
+return;
+}
+const g = inSink.querySelector(".gr:not(.gone)");
+if (g) {
+g.classList.add("gone");
+dirt--;
+sfx.squeak();
+puff(x, y, "🫧");
+}
+if (dirt <= 0) {
+const clean = inSink;
+inSink = null;
+sponge.hidden = true;
+clean.classList.add("sparkle");
+const [cx, cy] = rel(clean, .5, .2);
+puff(cx, cy, "✨");
+later(() => {
+flyTo(clean, rack, .5, .6);
+sfx.boing();
+}, 350);
+later(() => {
+const emoji = clean.querySelector(".dd").textContent;
+clean.remove();
+rackDishes.appendChild(el(`<span class="racked">${emoji}</span>`));
+rack.classList.remove("bump");
+void rack.offsetWidth;
+rack.classList.add("bump");
+done++;
+if (learn) {
+const [rx, ry] = rel(rack, .5, 0);
+numPop(done, rx, ry);
+say(NUMW[done]);
+} else sfx.chime();
+if (done >= N) later(() => winMini(learn ? `${cap(NUMW[N])} clean dishes! Squeaky clean!` : "All the dishes are clean!"), 500);
+}, 850);
+}
+}
+let down = false;
+const onDown = ev => {
+down = true;
+try {
+arena.setPointerCapture(ev.pointerId);
+} catch (e) {}
+scrubAt(ev);
+};
+const onUp = () => {
+down = false;
+};
+arena.addEventListener("pointerdown", onDown);
+arena.addEventListener("pointermove", scrubAt);
+window.addEventListener("pointerup", onUp);
+window.addEventListener("pointercancel", onUp);
+mg.cleanup.push(() => {
+arena.removeEventListener("pointerdown", onDown);
+arena.removeEventListener("pointermove", scrubAt);
+window.removeEventListener("pointerup", onUp);
+window.removeEventListener("pointercancel", onUp);
+});
+}
+
+// LAUNDRY: tap muddy clothes into the washer, press the big button, watch it spin,
+// then tap each clean piece to hang it on the clothesline.
+// learn: clothes are counted going in and coming out.
+function laundryChore(learn) {
+arena.classList.add("chore", "c-laundry");
+const clothes = shuffle([ "👕", "👖", "🧦", "👗", "👚", "🩳" ]).slice(0, learn ? rint(3, 5) : 4);
+const N = clothes.length;
+const washer = el('<div class="washer"><div class="wtop"><span class="knob"></span><span class="knob"></span></div><div class="porthole"><div class="drum"></div></div><button class="wbtn" aria-label="Start the washer"></button></div>');
+const line = el('<div class="cline"><div class="rope"></div><div class="hung"></div></div>');
+arena.append(line, washer);
+const drum = washer.querySelector(".drum"), wbtn = washer.querySelector(".wbtn"), hung = line.querySelector(".hung");
+const point = el('<div class="point">👆</div>');
+let loaded = 0, stage = "load", hungN = 0;
+spread(N, [ 8, 50, 30, 88 ], 2).forEach((p, k) => {
+const c = el(`<button class="dirtycloth" aria-label="Dirty clothes"><span class="dd">${clothes[k]}</span><i class="gr g1"></i><i class="gr g2"></i></button>`);
+c.style.left = p[0] + "%";
+c.style.top = p[1] + "%";
+c.style.setProperty("--r", rint(-25, 25) + "deg");
+arena.appendChild(c);
+if (k === 0) {
+point.style.left = `calc(${p[0]}% + 10px)`;
+point.style.top = `calc(${p[1]}% + 30px)`;
+arena.appendChild(point);
+}
+tapOn(c, () => {
+if (stage !== "load" || mg.done || c.classList.contains("fly")) return;
+if (point.parentNode) point.remove();
+flyTo(c, washer.querySelector(".porthole"), .5, .5);
+sweep(300, 700, .18, "triangle", .1);
+const k2 = ++loaded;
+later(() => {
+c.remove();
+drum.appendChild(el(`<span class="inwash">${clothes[k]}</span>`));
+if (learn) {
+const [x, y] = rel(washer, .5, 0);
+numPop(k2, x, y);
+say(NUMW[k2]);
+}
+if (k2 >= N) {
+stage = "start";
+wbtn.classList.add("ready");
+const p2 = el('<div class="point pbtn">👆</div>');
+washer.appendChild(p2);
+later(() => say(learn ? `${cap(NUMW[N])} clothes! Push the button!` : "Push the button!", true), learn ? 700 : 100);
+}
+}, 480);
+});
+});
+tapOn(wbtn, () => {
+if (stage !== "start" || mg.done) return;
+stage = "spin";
+const p2 = washer.querySelector(".pbtn");
+if (p2) p2.remove();
+wbtn.classList.remove("ready");
+washer.classList.add("spinning");
+sfx.boop();
+for (let i = 0; i < 10; i++) later(() => {
+sweep(200, 420, .22, "sine", .06);
+const [x, y] = rel(washer, rnd(.2, .8), rnd(.2, .5));
+puff(x, y, "🫧");
+}, 150 + i * 240);
+later(() => {
+washer.classList.remove("spinning");
+stage = "hang";
+sfx.chime();
+drum.innerHTML = "";
+washer.classList.add("open");
+line.classList.add("show");
+say("All clean! Let's hang them up.");
+spread(N, [ 10, 52, 42, 86 ], 2).forEach((p, k) => later(() => {
+const c = el(`<button class="cleancloth" aria-label="Clean clothes">${clothes[k]}</button>`);
+const [wx, wy] = rel(washer.querySelector(".porthole"), .5, .5);
+c.style.left = wx + "px";
+c.style.top = wy + "px";
+arena.appendChild(c);
+requestAnimationFrame(() => requestAnimationFrame(() => {
+c.style.left = p[0] + "%";
+c.style.top = p[1] + "%";
+}));
+sfx.boing();
+tapOn(c, () => {
+if (stage !== "hang" || mg.done || c.classList.contains("fly")) return;
+const slot = el('<span class="peg"><i class="pin"></i><span class="hangcloth"></span></span>');
+hung.appendChild(slot);
+flyTo(c, slot, .5, .7);
+sweep(700, 1100, .12, "sine", .08);
+const k2 = ++hungN;
+later(() => {
+c.remove();
+slot.querySelector(".hangcloth").textContent = clothes[k];
+slot.classList.add("on");
+if (learn) {
+const [x, y] = rel(slot, .5, 1);
+numPop(k2, x, y);
+say(NUMW[k2]);
+}
+if (k2 >= N) later(() => winMini("Fresh clean clothes! Smells so good!"), 600);
+}, 480);
+});
+}, k * 160));
+}, 2700);
+});
+}
+
 const CHORES = {
 rake: learn => rubChore({
 bg: "c-lawn",
@@ -1647,22 +1905,8 @@ tool: "🧽",
 finish: () => arena.appendChild(el('<div class="duck">🦆</div>')),
 end: "Sparkly clean tub!"
 }, learn),
-dish: learn => rubChore({
-bg: "c-kitchen",
-n: [ 3, 5 ],
-area: [ 8, 54, 12, 86 ],
-cols: 2,
-target: '<span class="plate">🍽️<i class="grime"></i></span>',
-fx: "🫧",
-tool: "🧽",
-stack: {
-icon: "🧺",
-x: 77,
-y: 66
-},
-stackEmoji: "🍽️",
-end: "Clean dishes! Squeak squeak!"
-}, learn),
+dish: learn => dishesChore(learn),
+laundry: learn => laundryChore(learn),
 water: learn => tapChore({
 bg: "c-garden",
 area: [ 10, 90, 50, 74 ],

@@ -241,3 +241,50 @@ button.bottle:focus-visible,button.star:focus-visible,button.toy:focus-visible{o
 .turn{position:absolute;right:12px;bottom:8px;font-size:40px;animation:tapme 1s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){.stacked,.tapi,.turn{animation:none}
 }
+.dirtydish,.dirtycloth,.cleancloth{position:absolute;width:84px;height:84px;background:0 0;border:0;padding:0;cursor:pointer;transform:translate(-50%,-50%) rotate(var(--r,0deg));transition:transform .45s ease,opacity .45s,left .5s cubic-bezier(.3,1.4,.5,1),top .5s cubic-bezier(.3,1.4,.5,1);z-index:3;-webkit-tap-highlight-color:transparent;animation:toyin .4s cubic-bezier(.3,1.7,.5,1) both}
+.dirtydish.fly,.dirtycloth.fly,.cleancloth.fly,.sinkdish.fly{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.4);opacity:.3}
+.dirtydish.nope{animation:nope .4s ease}
+.dd{display:block;font-size:60px;line-height:84px;text-align:center}
+.gr{position:absolute;width:24px;height:18px;border-radius:50%;background:rgba(138,90,59,.85);transition:transform .3s,opacity .3s;pointer-events:none}
+.gr.g1{left:22%;top:30%}.gr.g2{left:52%;top:48%;width:18px;height:14px}.gr.g3{left:30%;top:60%;width:20px}
+.gr.gone{transform:scale(0);opacity:0}
+.sink{position:absolute;left:5%;bottom:6%;width:58%;height:34%;background:#9fdcff;border:8px solid #d9dee8;border-radius:14px 14px 30px 30px;box-shadow:inset 0 10px 0 rgba(255,255,255,.35);z-index:1}
+.suds{position:absolute;left:0;right:0;top:-12px;height:26px;background:radial-gradient(circle at 10% 60%,#fff 0 12px,transparent 13px),radial-gradient(circle at 30% 40%,#fff 0 14px,transparent 15px),radial-gradient(circle at 52% 60%,#fff 0 12px,transparent 13px),radial-gradient(circle at 72% 40%,#fff 0 15px,transparent 16px),radial-gradient(circle at 90% 60%,#fff 0 12px,transparent 13px)}
+.faucet{position:absolute;left:44%;top:-46px;width:44px;height:36px;border:8px solid #b8c0cc;border-bottom:0;border-radius:24px 24px 0 0}
+.bub{position:absolute;bottom:10%;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.9);animation:rise 2.4s ease-in infinite;pointer-events:none}
+@keyframes rise{0%{transform:translateY(0);opacity:0}20%{opacity:1}to{transform:translateY(-90px);opacity:0}}
+.sinkdish{position:absolute;left:50%;top:55%;width:84px;height:84px;transform:translate(-50%,-50%);transition:transform .45s ease,opacity .45s;z-index:2}
+.sinkdish.sparkle{filter:drop-shadow(0 0 8px #fff)}
+.sponge2{z-index:6}
+.rack{position:absolute;right:5%;bottom:8%;width:30%;height:30%;border:6px solid #b8c0cc;border-top:0;border-radius:0 0 16px 16px;background:repeating-linear-gradient(90deg,transparent 0 18px,rgba(184,192,204,.7) 18px 22px);z-index:1}
+.rack.bump{animation:stackbump2 .35s ease}
+@keyframes stackbump2{50%{transform:scale(1.06)}}
+.rackdishes{position:absolute;left:4px;right:4px;bottom:4px;display:flex;flex-wrap:wrap-reverse;justify-content:center}
+.racked{font-size:38px;line-height:1;animation:toyin .3s ease both}
+.c-laundry{background:linear-gradient(#cfeeff 0 62%,#e8d7c5 62%)}
+.washer{position:absolute;right:6%;bottom:5%;width:min(42%,46cqh);aspect-ratio:.82;background:#fff;border:5px solid #d9dee8;border-radius:18px;box-shadow:0 8px 0 rgba(59,42,85,.15);z-index:2}
+.washer.spinning{animation:shake .12s linear infinite}
+@keyframes shake{25%{transform:translate(-2px,1px) rotate(-.6deg)}75%{transform:translate(2px,-1px) rotate(.6deg)}}
+.wtop{height:16%;border-bottom:4px solid #e6eaf2;display:flex;gap:8px;align-items:center;padding-left:10px}
+.knob{width:16px;height:16px;border-radius:50%;background:#b9a2ff}
+.porthole{position:absolute;left:50%;top:56%;width:68%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:#bfe6ff;border:10px solid #b8c0cc;overflow:hidden;box-sizing:border-box}
+.drum{position:absolute;inset:0;display:flex;flex-wrap:wrap;align-content:flex-end;justify-content:center;padding:6px}
+.spinning .drum{animation:spin .6s linear infinite;background:radial-gradient(circle,#fff 0 6px,transparent 7px) 10px 10px/34px 34px,rgba(255,255,255,.3)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.open .porthole{background:#e6f6ff}
+.inwash{font-size:30px;line-height:1.1}
+.wbtn{position:absolute;right:10px;top:4px;width:42px;height:42px;border-radius:50%;border:4px solid #ff6fae;background:#ffb3d1;cursor:pointer;padding:0}
+.wbtn.ready{background:#6fdc8c;border-color:#3aa85a;animation:glow .9s ease-in-out infinite}
+@keyframes glow{50%{transform:scale(1.2);box-shadow:0 0 16px #6fdc8c}}
+.pbtn{right:-6px;top:30px;left:auto}
+.cline{position:absolute;left:5%;right:5%;top:4%;height:26%;opacity:0;transition:opacity .5s;pointer-events:none}
+.cline.show{opacity:1}
+.rope{position:absolute;left:0;right:0;top:14px;height:4px;background:#a0683f;border-radius:2px}
+.hung{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-evenly}
+.peg{position:relative;width:64px;height:100px;display:flex;flex-direction:column;align-items:center}
+.pin{display:block;width:8px;height:24px;background:#ffc93c;border-radius:3px;margin-top:6px}
+.hangcloth{font-size:52px;line-height:1;margin-top:-6px;transform-origin:top center}
+.peg.on .hangcloth{animation:sway 2s ease-in-out infinite}
+@keyframes sway{50%{transform:rotate(6deg)}}
+.cleancloth{font-size:60px;line-height:84px;text-align:center;animation:none}
+@media (prefers-reduced-motion:reduce){.bub,.washer.spinning,.spinning .drum,.wbtn.ready,.peg.on .hangcloth{animation:none}}
